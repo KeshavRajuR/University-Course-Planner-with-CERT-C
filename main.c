@@ -5,9 +5,8 @@
 #include "header1.h"
 #include "header2.h"
 
-//MSC00-A
-char username[10];
-char passwd[20];
+usrn username[10];
+usrn passwd[20];
 
 int chkAccount(char *username, char *passwd)
 {
