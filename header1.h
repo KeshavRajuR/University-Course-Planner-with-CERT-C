@@ -1,14 +1,21 @@
 #include <stdio.h>
-#include<errno.h>
-#include<string.h>
-#include<math.h>
+#include <errno.h>
+#include <string.h>
+#include <stdbool.h>
+#include <math.h>
 
+//DCL12-A
+typedef int counter;
+typedef int StackTop;
+typedef char creds;
 
 typedef struct node //DCL05-A
 {
     int vertex;
     struct node *next;
 } node;
+
+typedef struct node* NODE;
 
 typedef struct Graph //DCL05-A
 {
@@ -19,7 +26,4 @@ typedef struct Graph //DCL05-A
     node **adjLists;
 } Graph;
 
-typedef char usrn;
-typedef int t;
-
-
+typedef struct Graph* GRAPH;
