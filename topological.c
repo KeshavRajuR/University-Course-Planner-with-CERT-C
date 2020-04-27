@@ -6,8 +6,8 @@
 #include "header2.h"
 
 //INT00-A 
-t top = -1;
-t count = 0;
+StackTop top = -1;
+counter count = 0;
 
 //ARR31-C
 void push(int arr[], int ele)
