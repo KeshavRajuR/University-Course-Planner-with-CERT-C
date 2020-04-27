@@ -6,19 +6,19 @@
 #include "header2.h"
 
 
-node *createNode(int v)
+NODE createNode(int v)
 {
     //MEM02-A //MEM03-A
-    struct node *newNode = malloc(sizeof(struct node));
+    NODE newNode = malloc(sizeof(struct node));
     newNode->vertex = v;
     newNode->next = NULL;
     return newNode;
 }
 
-Graph *createGraph(int vertices)
+GRAPH createGraph(int vertices)
 {
     //MEM02-A //MEM03-A //MEM04-A
-    struct Graph *graph = malloc(sizeof(struct Graph));
+    GRAPH graph = malloc(sizeof(struct Graph));
     graph->numVertices = vertices;
     graph->adjLists = malloc(vertices * sizeof(node *));
     graph->visited = malloc(vertices * sizeof(bool));
@@ -36,9 +36,8 @@ Graph *createGraph(int vertices)
 void addEdge(struct Graph *graph, int src, int dest)
 {
     // Add edge from dest to src
-    struct node *newNode = createNode(src);
+    NODE newNode = createNode(src);
     newNode->next = graph->adjLists[dest];
     graph->adjLists[dest] = newNode;
     graph->indegree[src]++;
 }
-
