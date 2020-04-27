@@ -5,6 +5,7 @@
 #include "header1.h"
 #include "header2.h"
 
+//MSC00-A
 int main()
 {
     system("clear");
@@ -106,6 +107,7 @@ int main()
     //Final sort
     printf("All Topological Sort: \n");
     printAllTopologicalOrders(graph);
-
+    //MEM00-A   MEM30-C     MEM31-C
+    free(graph);
     return 0;
 }
