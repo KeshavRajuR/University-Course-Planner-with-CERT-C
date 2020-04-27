@@ -87,7 +87,10 @@ void findAllTopologicalOrders(Graph *graph, int *stack)
                 graph->indegree[adjList->vertex]++;
                 adjList = adjList->next;
             }
-           
+            
+            pop(stack);
+            graph->visited[v]  = false;
+            
         }
     }
     if (top == (graph->numVertices - 1))
