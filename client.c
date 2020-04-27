@@ -41,6 +41,7 @@ int main()
     //Getting some information about the user.
     //The number before the s is to make sure that scanf will only read that many characters.
     //This helps us avoid stack smashing
+    //MEM05-A
     while (flag)
     {
         printf("Enter your Full Name: ");
