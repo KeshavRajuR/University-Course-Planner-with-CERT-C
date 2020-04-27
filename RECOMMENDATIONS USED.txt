@@ -1,11 +1,12 @@
 DCL02-A = Use visually distinct identifiers
 DCL05-A = Use typedefs to improve code readability
 DCL07-A = Ensure every function has a function prototype
-DCL09-A. Declare functions that return an errno error code with a return type of errno_t
+DCL09-A = Declare functions that return an errno error code with a return type of errno_t
 DCL32-C = Guarantee identifiers are unique
 MEM02-A = Do not cast the return value from malloc
 MEM03-A = Clear sensitive information stored in dynamic memory prior to deallocation
 MEM04-A = Do not make assumptions about the result of allocating 0 bytes
+MEM05-A = Avoid large stack allocations
 FIO46-C = Do not access closed file
 FIO37-C = Do not assume that fgets() or fgetws() returns a nonempty string when successful
 STR31-C = Guarantee that storage for strings has sufficient space for character data and the null terminator
