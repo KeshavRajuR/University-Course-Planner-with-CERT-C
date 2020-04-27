@@ -19,6 +19,7 @@ typedef struct Graph //DCL05-A
     node **adjLists;
 } Graph;
 
-
+typedef char usrn;
+typedef int t;
 
 
