@@ -1,7 +1,8 @@
-DCL05-A = Use typedefs to improve code readability
 DCL02-A = Use visually distinct identifiers
-DCL32-C = Guarantee identifiers are unique
+DCL05-A = Use typedefs to improve code readability
 DCL07-A = Ensure every function has a function prototype
+DCL09-A. Declare functions that return an errno error code with a return type of errno_t
+DCL32-C = Guarantee identifiers are unique
 MEM02-A = Do not cast the return value from malloc
 MEM03-A = Clear sensitive information stored in dynamic memory prior to deallocation
 MEM04-A = Do not make assumptions about the result of allocating 0 bytes
