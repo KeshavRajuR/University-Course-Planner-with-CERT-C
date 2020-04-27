@@ -6,9 +6,12 @@
 //DCL07-A
 void push(int [], int);
 int pop(int []);
-Graph* createGraph(int);
+
+//DCL12-A
+extern GRAPH createGraph(int);
 void addEdge(Graph *, int, int);
 void printAllTopologicalOrders(Graph *);
+
 int chkAccount(char *, char *);
 int login();
 int registerUser();
