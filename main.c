@@ -5,8 +5,8 @@
 #include "header1.h"
 #include "header2.h"
 
-usrn username[10];
-usrn passwd[20];
+creds username[10];
+creds passwd[20];
 
 int chkAccount(char *username, char *passwd)
 {
