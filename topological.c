@@ -5,9 +5,9 @@
 #include "header1.h"
 #include "header2.h"
 
-//INT00-A //INT09-A
-int top = -1;
-int count = 0;
+//INT00-A 
+t top = -1;
+t count = 0;
 
 //ARR31-C
 void push(int arr[], int ele)
