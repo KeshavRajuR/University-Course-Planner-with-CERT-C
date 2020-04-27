@@ -85,6 +85,10 @@ int main()
         {
             printf("You need to select at least 3 subjects!");
         }
+        else
+        {
+            flag = 0;
+        }
     }
 
     Graph *graph = createGraph(numberofsubjects);
