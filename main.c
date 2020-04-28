@@ -163,6 +163,7 @@ int login()
 
 int studentInfo()
 {
+    //STR02-A
     static strings ok_chars_name[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.@";
     static strings ok_chars_srn[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.@";
 
