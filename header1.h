@@ -7,6 +7,8 @@
 //DCL12-A   //DCL05-A
 typedef int counter;
 typedef int StackTop;
+typedef int size;
+typedef char strings;
 typedef char creds;
 
 typedef struct node //DCL05-A
