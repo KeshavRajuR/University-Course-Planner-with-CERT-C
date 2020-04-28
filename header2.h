@@ -15,3 +15,4 @@ void printAllTopologicalOrders(Graph *);
 int chkAccount(char *, char *);
 int login();
 int registerUser();
+int studentInfo();
