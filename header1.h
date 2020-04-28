@@ -4,8 +4,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-//EXP03-A
-//DCL12-A
+//DCL12-A   //DCL05-A
 typedef int counter;
 typedef int StackTop;
 typedef char creds;
