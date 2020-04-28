@@ -11,10 +11,9 @@ int main()
     system("clear");
 
     int flag = 1;
-    int numberofsubjects = 2;
-    char answer[10];
-    char srn[14], name[20];
-    char ans[3];
+    size numberofsubjects = 2;
+    
+    strings answer[10];
 
     printf("HI THERE!\n\n");
 
@@ -39,27 +38,11 @@ int main()
 
     printf("WELCOME TO PES UNIVERSITY\n");
 
-    //Getting some information about the user.
-    //The number before the s is to make sure that scanf will only read that many characters.
-    //This helps us avoid stack smashing
-    //MEM05-A
     while (flag)
     {
-        printf("Enter your Full Name: ");
-        scanf(" %[^\n]s ", name);
+        flag = studentInfo();
 
-        printf("Enter your SRN: ");
-        scanf("%14s", srn);
-
-        printf("Your information will be printed here, make sure it is correct.\n");
-        printf("Name: %s\tSRN: %s\n", name, srn);
-        printf("\nIs everything correct?\n[yes/no]: ");
-        scanf("%3s", ans);
-
-        if (!strcmp(ans, "yes"))
-        {
-            flag = 0;
-        }
+        system("clear");
     }
     
     system("clear");
@@ -78,7 +61,7 @@ int main()
     flag = 1;
     while(flag)
     {
-        printf("\n\nEnter the number of subjects :\n");
+        printf("\n\nEnter the number of subjects: ");
         scanf("%d", &numberofsubjects);
         
         if(numberofsubjects < 3)
