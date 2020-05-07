@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
 #include "header1.h"
 #include "header2.h"
 
@@ -31,7 +29,6 @@ GRAPH createGraph(int vertices)
     }
     return graph;
 }
-
 
 void addEdge(struct Graph *graph, int src, int dest)
 {
