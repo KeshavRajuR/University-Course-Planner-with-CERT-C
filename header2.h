@@ -8,10 +8,12 @@ void push(int [], int);
 int pop(int []);
 
 //DCL12-A
+void createSubjectOrder();
 extern GRAPH createGraph(int);
 void addEdge(Graph *, int, int);
 void printAllTopologicalOrders(Graph *);
 
+void welcomeMessage();
 int chkAccount(char *, char *);
 int login();
 int registerUser();
