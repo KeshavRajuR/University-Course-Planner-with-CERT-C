@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
 #include "header1.h"
 #include "header2.h"
 
-//INT00-A 
+//INT00-A
 StackTop top = -1;
 counter count = 0;
 
@@ -26,7 +24,6 @@ int pop(int arr[])
         return arr[top--];
     }
 }
-
 
 void show(int arr[])
 {
@@ -51,7 +48,6 @@ void show(int arr[])
     fprintf(outputFile, "%s", "\n");
     fclose(outputFile); //FIO46-C
 }
-
 
 void findAllTopologicalOrders(Graph *graph, int *stack)
 {
@@ -78,7 +74,7 @@ void findAllTopologicalOrders(Graph *graph, int *stack)
 
             //Now recursively call this function
             findAllTopologicalOrders(graph, stack);
-            
+
             //Now backtracking
             adjList = graph->adjLists[v];
             while (adjList != NULL)
@@ -87,17 +83,15 @@ void findAllTopologicalOrders(Graph *graph, int *stack)
                 graph->indegree[adjList->vertex]++;
                 adjList = adjList->next;
             }
-            
+
             pop(stack);
-            graph->visited[v]  = false;
-            
+            graph->visited[v] = false;
         }
     }
     if (top == (graph->numVertices - 1))
     {
         show(stack);
     }
-    
 }
 
 void printAllTopologicalOrders(Graph *graph)
@@ -106,4 +100,3 @@ void printAllTopologicalOrders(Graph *graph)
     stack = calloc(graph->numVertices, sizeof(int));
     findAllTopologicalOrders(graph, stack);
 }
-
