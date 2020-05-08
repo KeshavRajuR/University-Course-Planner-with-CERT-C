@@ -22,4 +22,5 @@ ARR31-C = Use consistent array notation across all source files
 INT00-A = Understand the data model used by your implementation
 TMP30-C = Temporary files must created with unique and unpredictable file names
 ENV04-A = Do not call system() if you do not need a command interpreter
+FIO37-C = Don't assume character data has been read
 MSC00-A = Compile cleanly at high warning levels
