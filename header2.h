@@ -14,7 +14,9 @@ void addEdge(Graph *, int, int);
 void printAllTopologicalOrders(Graph *);
 
 void welcomeMessage();
-int chkAccount(char *, char *);
-int login();
-int registerUser();
-int studentInfo();
+void red();
+void green();
+void yellow();
+void blue();
+void magenta();
+void cyan();
