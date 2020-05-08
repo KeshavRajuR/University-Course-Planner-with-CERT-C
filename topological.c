@@ -33,6 +33,7 @@ void show(int arr[])
 
     if (top == -1)
     {
+        red();
         printf("The stack is empty.\n");
     }
     for (int i = 0; i <= top; i++)
@@ -40,6 +41,7 @@ void show(int arr[])
         fprintf(outputFile, "%d ", arr[i] + 1);
         if ((i % 4) == 0)
         {
+            green();
             printf("\n");
         }
         printf("%d ", arr[i] + 1);
