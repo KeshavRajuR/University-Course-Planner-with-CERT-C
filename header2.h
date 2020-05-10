@@ -13,10 +13,12 @@ extern GRAPH createGraph(int);
 void addEdge(Graph *, int, int);
 void printAllTopologicalOrders(Graph *);
 
-void welcomeMessage();
+extern SIGNIN welcome(SIGNIN input);
+int BOFcheck(char *, int, int);
 void red();
 void green();
 void yellow();
 void blue();
 void magenta();
 void cyan();
+void reset();
