@@ -9,10 +9,14 @@
 #include "header1.h"
 #include "header2.h"
 
+//I-M-P-O-R-T-A-N-T//
+//Need to change exit(0) to return and have a implementation in client.c
+//Need to free all the malloc and null the variable and fclose all files
+
 #define MAXPW 20
 
-creds username[10];
-creds passwd[MAXPW];
+strings username[10];
+strings passwd[MAXPW];
 
 void red()
 {
@@ -47,6 +51,24 @@ void cyan()
 void reset()
 {
     printf("\033[0m");
+}
+
+int BOFcheck(char *answer, int inputSize, int inputSpace)
+{
+    //Clear input overflow from fgets if any
+    if (inputSize >= inputSpace - 1)
+    {
+        while ((*answer = getchar()) != '\n' && *answer != EOF)
+        {
+            //No code here//
+        }
+
+        red();
+        printf("\nError, input too long.\n");
+        sleep(2);
+        return 0;
+    }
+    return 1;
 }
 
 /* read a string from fp into pw masking keypress with mask char.
@@ -145,57 +167,45 @@ const char *sanitizeInput(char *text)
     return text;
 }
 
-int chkAccount(char *username, char *passwd)
+CHKCREDS chkAccount(CHKCREDS chk)
 {
     //ARR31-C  //STR05-A
-    char login_creds[100];
     int result;
 
-    for (int i = 0; i < strlen(passwd); i++)
-    {
-        if (passwd[i] == ' ')
-        {
-            red();
-            printf("\nYour password contains a space. This is not allwed!!\nTry again\n");
-            return 1;
-        }
-    }
-
-    strcpy(login_creds, username);
-    strcat(login_creds, ":");
-    strcat(login_creds, passwd);
-    strcat(login_creds, "\n");
-
-    FILE *check;
+    FILE *credsFile;
     int bufferLength = 100;
     char buffer[bufferLength];
 
-    check = fopen("creds.txt", "r");
+    credsFile = fopen("creds.txt", "r");
 
     //DCL09-A
-    if (check == NULL)
+    if (credsFile == NULL)
     {
         red();
         fprintf(stderr, "\nPROGRAM RAN INTO ERROR \nERROR VALUE : %d \nERROR MESSAGE : %s\n", errno, strerror(errno));
-        return -1;
+        chk->flag = -1;
+        return chk;
     }
     else
     {
         // FIO37-C  STR31-C
-        while (fgets(buffer, bufferLength, check))
+        while (fgets(buffer, bufferLength, credsFile))
         {
-            result = strcmp(login_creds, buffer);
+            result = strcmp(chk->login_creds, buffer);
             if (result == 0)
             {
-                return result;
+                fclose(credsFile);
+                chk->flag = 1;
+                return chk;
             }
         }
-        return result;
+        fclose(credsFile);
+        chk->flag = 0;
+        return chk;
     }
-    fclose(check);
 }
 
-int credValidity(char *username, char *passwd)
+VALIDATECREDS credValidity(VALIDATECREDS valid)
 {
     int flagInput = 0;
 
@@ -212,8 +222,8 @@ int credValidity(char *username, char *passwd)
     {
         red();
         fprintf(stderr, "\nPROGRAM RAN INTO ERROR \nERROR VALUE : %d \nERROR MESSAGE : %s\n", errno, strerror(errno));
-
-        return -1;
+        valid->flag = -1;
+        return valid;
     }
     else
     {
@@ -227,7 +237,8 @@ int credValidity(char *username, char *passwd)
                 printf("\nThis user already exists. Try a different username.\n");
                 sleep(5);
                 system("clear");
-                return 0;
+                valid->flag = 0;
+                return valid;
             }
         }
     }
@@ -238,7 +249,8 @@ int credValidity(char *username, char *passwd)
     {
         red();
         printf("\nEither your username or password is longer than required.\nTry again\n");
-        return flagInput;
+        valid->flag = 0;
+        return valid;
     }
     else
     {
@@ -248,7 +260,8 @@ int credValidity(char *username, char *passwd)
             {
                 red();
                 printf("\nYour username contains a space. This is not allwed!!\nTry again\n");
-                return flagInput;
+                valid->flag = 0;
+                return valid;
             }
         }
         for (int i = 0; i < strlen(passwd); i++)
@@ -257,237 +270,198 @@ int credValidity(char *username, char *passwd)
             {
                 red();
                 printf("\nYour password contains a space. This is not allwed!!\nTry again\n");
-                return flagInput;
+                valid->flag = 0;
+                return valid;
             }
         }
         red();
         printf("\nUsername and Password looks good. Proceeding to create the account.\n");
-        return !flagInput;
+        valid->flag = 1;
+        return valid;
     }
 }
 
-int login()
+USERCREDS login(USERCREDS creds)
 {
     int loginCount = 3;
     int result;
 
-    char *nullRemove;
     int count = 0;
 
-    char pw[MAXPW] = {0};
-    char *pass = pw;
-    FILE *input = stdin;
-    ssize_t passHide = 0;
+    CHKCREDS chk;
+    chk = (CHKCREDS)malloc(sizeof(CHKCREDS));
 
-    while (loginCount > 0)
+    for (int i = 0; i < strlen(creds->Username); i++)
     {
-        count = 0;
-
-        blue();
-        printf("Enter your username: ");
-        reset();
-        if (fgets(username, sizeof username, stdin) == NULL)
+        if (creds->Username[i] == '_')
         {
-            red();
-            printf("\nError, input too long.\n");
+            count = count + 1;
         }
-        else
+    }
+
+    sanitizeInput(creds->Username);
+
+    for (int i = 0; i < strlen(creds->Username); i++)
+    {
+        if (creds->Username[i] == '_')
         {
-            nullRemove = strchr(username, '\n');
-            if (nullRemove)
-            {
-                *nullRemove = '\0';
-            }
+            count = count - 1;
         }
+    }
 
-        for (int i = 0; i < strlen(username); i++)
+    if (count != 0)
+    {
+        red();
+        printf("\nThere are invalid/special characters in your username.\n");
+        creds->flag = 0;
+        return creds;
+    }
+    else
+    {
+        for (int i = 0; i < strlen(creds->Passwd); i++)
         {
-            if (username[i] == '_')
-            {
-                count = count + 1;
-            }
-        }
-
-        sanitizeInput(username);
-
-        for (int i = 0; i < strlen(username); i++)
-        {
-            if (username[i] == '_')
-            {
-                count = count - 1;
-            }
-        }
-
-        if (count != 0)
-        {
-            red();
-            printf("\nThere are invalid/special characters in your username.\n");
-            --loginCount;
-        }
-        else
-        {
-            blue();
-            printf("Enter your password: ");
-            reset();
-            passHide = getpasswd(&pass, MAXPW, '*', input);
-
-            system("clear");
-
-            result = chkAccount(username, pass);
-            if (result == 0)
-            {
-                cyan();
-                printf("Login successful!! Welcome %s\n", username);
-                return 0;
-            }
-            else if (result == -1)
-            {
-                loginCount = 0;
-            }
-            else
+            if (creds->Passwd[i] == ' ')
             {
                 red();
-                printf("\nLogin failed! Try again.\n\n");
+                printf("\nYour password contains a space. This is not allwed!!\nTry again\n");
+                creds->flag = 0;
+                return creds;
             }
+        }
 
-            --loginCount;
+        strcpy(chk->login_creds, creds->Username);
+        strcat(chk->login_creds, ":");
+        strcat(chk->login_creds, creds->Passwd);
+        strcat(chk->login_creds, "\n");
+
+        chkAccount(chk);
+        if (chk->flag == 1)
+        {
+            system("clear");
+            cyan();
+            printf("Login successful!! Welcome %s\n", username);
+            creds->flag = 1;
+            return creds;
+        }
+        else if (chk->flag == -1)
+        {
+            creds->flag = -1;
+            return creds;
+        }
+        else
+        {
+            red();
+            printf("\nLogin failed! Try again.\n\n");
+            return 0;
         }
     }
-    if (loginCount == 0)
-    {
-        system("clear");
-        red();
-        printf("\nMax limit reached!! Try again later.\n\n");
-    }
-    exit(0);
 }
 
-int registerUser()
+REGISTERUSERS registerUser(REGISTERUSERS reg)
 {
     int count = 0;
-    char *nullRemove;
+/*
+    FILE *newUser;
+    newUser = fopen("creds.txt", "a");
+    if (newUser == NULL)
+    {
+        red();
+        fprintf(stderr, "\nPROGRAM RAN INTO ERROR \nERROR VALUE : %d \nERROR MESSAGE : %s\n", errno, strerror(errno));
+        reg->flag = -1;
+        return reg;
+    }
+*/
 
-    char pw[MAXPW] = {0};
-    FILE *input = stdin;
-    char *pass1 = pw;
-    char *pass2 = pw;
-    ssize_t passHide = 0;
-
-    FILE *newUser; //File has been opened by newuser later in the code...
     int registerCount = 5;
 
-    cyan();
-    printf("Let's create your login credentials!!! \nRules for username and password:\n");
-    printf("1) Username cannot be longer than 10 characters\n2) Password cannot be longer than 20 characetersr\n3) No spaces in the username or password\n\n");
-
-    while (registerCount > 0)
+    for (int i = 0; i < strlen(reg->Username); i++)
     {
-        blue();
-        printf("Enter your username: ");
-        reset();
-        if (fgets(username, sizeof username, stdin) == NULL)
+        if (reg->Username[i] == '_')
         {
-            red();
-            printf("\nError, input too long.\n");
-        }
-        else
-        {
-            nullRemove = strchr(username, '\n');
-            if (nullRemove)
-            {
-                *nullRemove = '\0';
-            }
-        }
-
-        for (int i = 0; i < strlen(username); i++)
-        {
-            if (username[i] == '_')
-            {
-                count = count + 1;
-            }
-        }
-
-        sanitizeInput(username);
-
-        for (int i = 0; i < strlen(username); i++)
-        {
-            if (username[i] == '_')
-            {
-                count = count - 1;
-            }
-        }
-
-        if (count != 0)
-        {
-            red();
-            printf("\nThere are invalid/special characters in your username.\n");
-            --registerCount;
-        }
-        else
-        {
-            blue();
-            printf("Enter your password: ");
-            reset();
-            passHide = getpasswd(&pass1, MAXPW, '*', input);
-
-            printf("\n");
-
-            blue();
-            printf("Enter your password again: ");
-            reset();
-            passHide = getpasswd(&pass2, MAXPW, '*', input);
-
-            if (!strcmp(pass1, pass2))
-            {
-                strcpy(passwd, pass2);
-
-                //ENV04-A
-                system("clear");
-                //STR00-A   STR01-A
-                int checkUser = credValidity(username, passwd);
-
-                if (checkUser == -1)
-                {
-                    return 0;
-                }
-                else if (checkUser == 0)
-                {
-                    --registerCount;
-                }
-                else if (checkUser == 1)
-                {
-                    char user[30];
-                    strcat(user, username);
-                    strcat(user, ":");
-                    strcat(user, passwd);
-                    strcat(user, "");
-                    newUser = fopen("creds.txt", "a");
-                    fprintf(newUser, "%s\n", user);
-                    fclose(newUser);
-
-                    cyan();
-                    printf("Your account has been created. Please go ahead and login.\n");
-                    sleep(5);
-
-                    system("clear");
-
-                    login();
-
-                    return 0;
-                    --registerCount;
-                }
-            }
-            else
-            {
-                red();
-                printf("\nYour password doesn't match. Enter carefully.\n");
-                --registerCount;
-            }
+            count = count + 1;
         }
     }
-    red();
-    printf("\nLooks like you have too many wrong attempts. Try again later.\n");
-    exit(0);
+
+    sanitizeInput(reg->Username);
+
+    for (int i = 0; i < strlen(reg->Username); i++)
+    {
+        if (reg->Username[i] == '_')
+        {
+            count = count - 1;
+        }
+    }
+
+    printf("\nUsername = %s\nPasswd1 = %s\nPasswd2 = %s\nDifference = %d\n", reg->Username, reg->Passwd1, reg->Passwd2, strcmp(reg->Passwd1, reg->Passwd2));
+
+    if (count != 0)
+    {
+        red();
+        printf("\nThere are invalid/special characters in your username.\n");
+        reg->flag = 0;
+        return reg;
+    }
+    else
+    {
+        if (strcmp(reg->Passwd1, reg->Passwd2) == 0)
+        {
+            VALIDATECREDS validate;
+            validate = (VALIDATECREDS)malloc(sizeof(VALIDATECREDS));
+
+            strcpy(validate->Username, reg->Username);
+            strcpy(validate->Passwd, reg->Passwd2);
+
+            //ENV04-A
+            system("clear");
+            //STR00-A   STR01-A
+
+            printf("fhdskjlhflshflahflsdhalf");
+
+            sleep(5);
+
+            credValidity(validate);
+
+            printf("fdhskfhdsjkfhsdkjf");
+
+            sleep(5);
+
+            if (validate->flag == -1)
+            {
+                reg->flag = -1;
+                return reg;
+            }
+            else if (validate->flag == 0)
+            {
+                reg->flag = 0;
+                return reg;
+            }
+            else if (validate->flag == 1)
+            {
+                strcat(reg->login_creds, validate->Username);
+                strcat(reg->login_creds, ":");
+                strcat(reg->login_creds, validate->Passwd);
+                strcat(reg->login_creds, "");
+                //fprintf(newUser, "%s\n", reg->login_creds);
+                //fclose(newUser);
+
+                cyan();
+                printf("Your account has been created. Please go ahead and login.\n");
+                sleep(5);
+
+                system("clear");
+            }
+            printf("The password is the same");
+            reg->flag = 1;
+            return reg;
+        }
+        else
+        {
+            red();
+            printf("\nYour password doesn't match. Enter carefully.\n");
+            reg->flag = 0;
+            return reg;
+        }
+    }
 }
 
 bool prefix(const char *pre, const char *str)
@@ -498,26 +472,67 @@ bool prefix(const char *pre, const char *str)
 int studentInfo()
 {
     int flag = 0;
+    char *nullRemove;
+
     strings ans[3];
+
+    strings fname[10];
+    strings lname[10];
 
     strings *name = (char *)malloc(20 * sizeof(char));
     strings *SRN = (char *)malloc(13 * sizeof(char));
+
+    blue();
+    printf("Enter your first Name: ");
+    reset();
+    if (fgets(fname, sizeof fname, stdin) == NULL)
+    {
+        red();
+        printf("\nError, input invalid.\n");
+    }
+    else
+    {
+        nullRemove = strchr(fname, '\n');
+        if (nullRemove)
+        {
+            *nullRemove = '\0';
+        }
+    }
+
+    blue();
+    printf("Enter your last Name: ");
+    reset();
+    if (fgets(lname, sizeof lname, stdin) == NULL)
+    {
+        red();
+        printf("\nError, input invalid.\n");
+    }
+    else
+    {
+        nullRemove = strchr(lname, '\n');
+        if (nullRemove)
+        {
+            *nullRemove = '\0';
+        }
+    }
 
     //Getting some information about the user.
     //The number before the s is to make sure that scanf will only read that many characters.
     //This helps us avoid stack smashing
     //MEM05-A
     blue();
-    printf("Enter your Full Name: ");
-    reset();
-    scanf(" %[^\n]s ", name);
-
-    blue();
     printf("Enter your SRN: ");
     reset();
     scanf("%14s", SRN);
 
-    sanitizeInput(name);
+    sanitizeInput(fname);
+    sanitizeInput(lname);
+
+    strcpy(name, fname);
+    strcat(name, " "); //we are intentionally adding this space to store it properly. This is not an issue as any other unwanted spaces will be removed by the sanitizeInput function
+    strcat(name, lname);
+
+    //sanitizeInput(name);
     sanitizeInput(SRN);
 
     for (int i = 0; i < strlen(name); i++)
@@ -586,7 +601,7 @@ int studentInfo()
         cyan();
         printf("\nYour information will be printed here, make sure it is correct.\n");
         printf("Name: %s\tSRN: %s\n", name, SRN);
-        
+
         blue();
         printf("\nIs everything correct?\n[yes/no]: ");
         reset();
@@ -605,43 +620,215 @@ int studentInfo()
     return flag;
 }
 
-void welcomeMessage()
+SIGNIN welcome(SIGNIN input)
 {
     int flag = 1;
-    char *nullRemove;
+    nullRemove del;
 
-    strings answer[10];
+    FILE *passInput = stdin;
+    ssize_t passHide = 0;
 
-    green();
-    printf("HI THERE!\n\n");
-    blue();
-    printf("Would you like to login or register?\n[login/register]: ");
-    reset();
-
-    //FIO37-C
-    if (fgets(answer, sizeof answer, stdin) == NULL)
-    {
-        red();
-        printf("\nError, input too long");
-    }
-    else
-    {
-        nullRemove = strchr(answer, '\n');
-        if (nullRemove)
-        {
-            *nullRemove = '\0';
-        }
-    }
+    USERCREDS creds;
+    creds = (USERCREDS)malloc(sizeof(USERCREDS));
+    char *loginPassword = creds->Passwd;
 
     system("clear");
 
-    if (!strcmp(answer, "login"))
+    if (!strcmp(input->answer, "login"))
     {
-        login();
+
+        int loginRetries = 3;
+        while (loginRetries > 0)
+        {
+            blue();
+            printf("Enter your username: ");
+            reset();
+            if (fgets(creds->Username, sizeof creds->Username, stdin) == NULL)
+            {
+                red();
+                printf("\nError, input invalid.\n");
+                exit(0);
+            }
+            else
+            {
+                del = strchr(creds->Username, '\n');
+                if (del)
+                {
+                    *del = '\0';
+                }
+            }
+
+            flag = BOFcheck(creds->Username, strlen(creds->Username), sizeof creds->Username);
+
+            if (flag == 1)
+            {
+                blue();
+                printf("Enter your password: ");
+                reset();
+                passHide = getpasswd(&loginPassword, MAXPW, '*', passInput);
+
+                flag = BOFcheck(creds->Passwd, strlen(creds->Passwd), sizeof creds->Passwd);
+
+                if (flag == 1)
+                {
+                    login(creds);
+                    if (creds->flag == 0)
+                    {
+                        --loginRetries;
+                        sleep(5);
+                    }
+                    else if (creds->flag == 1)
+                    {
+                        loginRetries = 0;
+                    }
+                    else
+                    {
+                        exit(0);
+                    }
+                }
+            }
+            system("clear");
+        }
+        if (loginRetries == 0 && (creds->flag == -1 || creds->flag == 0))
+        {
+            system("clear");
+            red();
+            printf("\nMax limit reached!! Try again later.\n\n");
+            exit(0);
+        }
     }
-    else if (!strcmp(answer, "register"))
+    else if (!strcmp(input->answer, "register"))
     {
-        registerUser();
+        REGISTERUSERS reg;
+        reg = (REGISTERUSERS)malloc(sizeof(REGISTERUSERS));
+
+        char *registerPassword1 = reg->Passwd1;
+        char *registerPassword2 = reg->Passwd2;
+
+        int registerRetries = 5;
+        while (registerRetries > 0)
+        {
+            cyan();
+            printf("Let's create your login credentials!!! \nRules for username and password:\n");
+            printf("1) Username cannot be longer than 10 characters\n2) Password cannot be longer than 20 characeters\n3) No spaces in the username or password\n\n");
+
+            blue();
+            printf("Enter your username: ");
+            reset();
+            if (fgets(reg->Username, sizeof reg->Username, stdin) == NULL)
+            {
+                red();
+                printf("\nError, input invalid.\n");
+            }
+            else
+            {
+                del = strchr(reg->Username, '\n');
+                if (del)
+                {
+                    *del = '\0';
+                }
+            }
+
+            flag = BOFcheck(reg->Username, strlen(reg->Username), sizeof reg->Username);
+
+            if (flag == 1)
+            {
+                blue();
+                printf("Enter your password: ");
+                reset();
+                passHide = getpasswd(&registerPassword1, MAXPW, '*', passInput);
+
+                flag = BOFcheck(reg->Passwd1, strlen(reg->Passwd1), sizeof reg->Passwd1);
+
+                if (flag == 0)
+                {
+                    red();
+                    printf("\nError, input too long\n");
+                    return 0;
+                }
+
+                printf("\n");
+
+                blue();
+                printf("Enter your password: ");
+                reset();
+                passHide = getpasswd(&registerPassword2, MAXPW, '*', passInput);
+
+                flag = BOFcheck(reg->Passwd2, strlen(reg->Passwd2), sizeof reg->Passwd2);
+
+                printf("\nPasswd1 = %s\nPasswd2 = %s\nDifference = %d\n", reg->Passwd1, reg->Passwd2, strcmp(reg->Passwd1, reg->Passwd2));
+
+                //sleep(2);
+
+                registerUser(reg);
+
+                printf("\nEnd of register\n");
+
+                if (reg->flag == 0)
+                {
+                    --registerRetries;
+                }
+                else if (reg->flag == 1)
+                {
+                    registerRetries = 0;
+                }
+                else
+                {
+                    exit(0);
+                }
+
+                printf("\nEnd of register if statement\n");
+            }
+            //system("clear");
+        }
+        printf("\nRegister retry max limit if statement\n");
+        if (registerRetries == 0 && (reg->flag == -1 || reg->flag == 0))
+        {
+            system("clear");
+            red();
+            printf("\nMax limit reached!! Try again later.\n\n");
+            exit(0);
+        }
+        printf("\nStart of login in register\n");
+        if (registerRetries == 0 && reg->flag == 1)
+        {
+            printf("\nStart of login retry\n");
+            int loginRetries = 3;
+            while (loginRetries > 0)
+            {
+                printf("\nStart of login\n");
+
+                strcpy(creds->Username, reg->Username);
+                strcpy(creds->Passwd, reg->Passwd1);
+
+                sleep(5);
+
+                login(creds);
+
+                printf("\nEnd of login\n");
+
+                if (creds->flag == 0)
+                {
+                    --loginRetries;
+                }
+                else if (creds->flag == 1)
+                {
+                    loginRetries = 0;
+                }
+                else
+                {
+                    exit(0);
+                }
+            }
+            printf("\nLogin retry max limit if statement\n");
+            if (loginRetries == 0 && (creds->flag == -1 || creds->flag == 0))
+            {
+                system("clear");
+                red();
+                printf("\nMax limit reached!! Try again later.\n\n");
+                exit(0);
+            }
+        }
     }
     else
     {
@@ -650,17 +837,27 @@ void welcomeMessage()
         exit(0);
     }
 
-    cyan();
-    printf("WELCOME TO PES UNIVERSITY\n\n");
-
-    while (flag)
+    if (1 == 1)
     {
-        flag = studentInfo();
+        cyan();
+        printf("WELCOME TO PES UNIVERSITY\n\n");
 
-        system("clear");
+        while (flag)
+        {
+            flag = studentInfo();
+
+            system("clear");
+        }
+    }
+    else
+    {
+        exit(0);
     }
 
-    reset();
+    printf("\nEnd of function\n");
+
+    //free(creds);
+    //creds = NULL;
 }
 
 void createSubjectOrder()
@@ -677,7 +874,7 @@ void createSubjectOrder()
     printf("23) Computer Networks\n24) Introduction to Operating Systems\n25) Principles of Programming Languages\n");
     printf("26) Advanced Algorithms\n27) Advanded Data Base Management Systems\n28) Big Data\n29) Multimedia Computing\n");
     printf("30) Information Security\n31) Web Services\n32) Algorithms for Intelligent Web\n");
-    
+
     red();
     printf("\nNOTE:\n");
     cyan();
@@ -705,10 +902,16 @@ void createSubjectOrder()
         }
     }
 
+    for (int i = 0; i < numberofsubjects; i++)
+    {
+    }
+
     Graph *graph = createGraph(numberofsubjects);
     cyan();
     printf("\nEnter the prerequisite in case there is any.");
     printf("Enter -1 -1 to end.\n");
+    printf("Format: \nYou will have to enter the value of the subject i.e the serial number from the above list.\n");
+    printf("PRE-REQUISITE<SPACE>SUBJECT\n");
 
     flag = 1;
     while (flag)
@@ -716,12 +919,12 @@ void createSubjectOrder()
         int prereq, subject;
 
         blue();
-        printf("\nEnter subject code and its pre-requisite :");
+        printf("\nEnter subject code and its pre-requisite: "); //Not able to choose random subjects. This has to be fixed.
         reset();
         scanf("%d %d", &prereq, &subject);
 
         green();
-        printf("%d --> %d", prereq, subject);
+        printf("%d --> %d\n", prereq, subject);
 
         if (prereq == -1)
         {
